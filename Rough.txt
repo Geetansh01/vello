@@ -1,0 +1,21 @@
+# DB Entities + Schema
+    1) user (user_id, name, email, password, address, phone)
+    2) order (order_id, user_id, product_id, product_quantity, mode, payment_id)
+    3) product (product_id, name, company, disease_category, price, discount, available_stock, slug, description, images_id)
+    4) image (image_id, url) [One to many]
+    4) delivery (user_id, weak_id, delivery_vendor, delivery_date) [weak attribute depends on user]
+    5) payment (payment_id, user_id, amount)
+
+# Pages
+    1) auth (signup + login)
+        // 1.1) Google OAuth
+        1.2) Email + password (username, address, phone number)
+    2) home ( lists all available medicines )
+    3) user profile
+        3.1) orders
+    4) product (product details)
+    5) cart
+    6) payment + checkout
+
+# APIs
+    
