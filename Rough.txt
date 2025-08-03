@@ -1,10 +1,11 @@
 # DB Entities + Schema
-    1) user (user_id, name, email, password, address, phone)
+    1) user (user_id, name, email, password, address, phone, user_image_url, // profile_share_link)
     2) order (order_id, user_id, product_id, product_quantity, mode, payment_id)
-    3) product (product_id, name, company, disease_category, price, discount, available_stock, slug, description, images_id)
+    3) product (product_id,product_type, trending (t/f), name, company, disease_category, mrp, discount, available_stock, slug, description, images_id)
     4) image (image_id, url) [One to many]
     4) delivery (user_id, weak_id, delivery_vendor, delivery_date) [weak attribute depends on user]
     5) payment (payment_id, user_id, amount)
+    6) Cart (user_id, product_id, product_quantity)
 
 # Pages
     1) auth (signup + login)
@@ -17,5 +18,55 @@
     5) cart
     6) payment + checkout
 
+
+
 # APIs
+    auth (Jwt based auth)
+    - login
+    - signup
+    - forget password
+
+    user_profile
+    - change email
+    - profile 
+        - user_id
+        
+    - update profile
+    - delete profile
+
+    product 
+        - product_list (api)
+            // filter based product apis
+            // pagination (skelition for ui)
+
+            - product_id
+            - product_slug
+            - trending (t/f)
+            - product_type
+            - name 
+            - mrp
+            - discount
+            - image
+            - available_stock
+
+        - product_Details
+            - product_id
+            - product_slug
+            - trending (t/f)
+            - product_type
+            - available_stock
+            - name 
+            - mrp
+            - discount
+            - image
+                - images_id
+            - description
+            - company
+
     
+            
+
+
+
+    
+
