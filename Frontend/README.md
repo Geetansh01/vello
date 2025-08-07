@@ -1,12 +1,28 @@
-# React + Vite
+# Medicine E-Commerce React App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, animated, and interactive medicine marketplace built with React, Tailwind CSS, Framer Motion, Lottie, and React Router v6+. UI-only, no backend required.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Auth pages (Login, Signup)
+- Home page with product grid, filters, skeleton loaders
+- Product details with carousel, related products
+- Cart, Checkout, Payment, Profile, Order History
+- Responsive, animated, and beautiful UI
+- Context API for cart and user state
+- Dummy fetch APIs (local JSON/Axios stubs)
+- Toast notifications, skeletons, Lottie animations
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React 19+
+- Tailwind CSS
+- Framer Motion
+- Lottie React
+- React Router v6+
+- Axios
+
+## Getting Started
+
+1. Install dependencies: `npm install`
+2. Run dev server: `npm run dev`

@@ -1,35 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 
-function App() {
-  const [count, setCount] = useState(0)
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import ProductDetails from './pages/ProductDetails';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import ProfilePage from './pages/ProfilePage';
+import OrderHistoryPage from './pages/OrderHistoryPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
+
+import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
+
+export default function App() {
+  const location = useLocation();
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          {/* Public Routes with Layout */}
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="product/:slug" element={<ProductDetails />} />
+            <Route path="cart" element={<CartPage />} />
+            
+            {/* Protected Routes with Layout */}
+            <Route path="checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+            <Route path="profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="orders" element={<ProtectedRoute><OrderHistoryPage /></ProtectedRoute>} />
+          </Route>
+          
+          {/* Routes without the main layout */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/order-success" element={<ProtectedRoute><OrderSuccessPage /></ProtectedRoute>} />
+        </Routes>
+      </AnimatePresence>
     </>
-  )
+  );
 }
-
-export default App
