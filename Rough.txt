@@ -1,23 +1,103 @@
 # DB Entities + Schema
-    1) user (user_id, name, email, password, address, phone, user_image_url, // profile_share_link)
-    2) order (order_id, user_id, product_id, product_quantity, mode, payment_id)
-    3) product (product_id,product_type, trending (t/f), name, company, disease_category, mrp, discount, available_stock, slug, description, images_id)
-    4) image (image_id, url) [One to many]
-    4) delivery (user_id, weak_id, delivery_vendor, delivery_date) [weak attribute depends on user]
-    5) payment (payment_id, user_id, amount)
-    6) Cart (user_id, product_id, product_quantity)
+
+1) user 
+    user_id PK, 
+    name, 
+    email UNIQUE, 
+    password, 
+    address TEXT, 
+    phone UNIQUE, 
+    user_image_url, 
+    profile_share_link UNIQUE
+)
+
+2) product (
+    product_id PK, 
+    product_type, 
+    trending BOOLEAN, 
+    name, 
+    company, 
+    disease_category, 
+    mrp, 
+    discount, 
+    available_stock INT, 
+    slug UNIQUE, 
+    description TEXT
+)
+
+3) image (
+    image_id PK, 
+    product_id FK -> product(product_id), 
+    url
+)
+
+4) cart (
+    cart_id PK,
+    user_id FK -> user(user_id), 
+    product_id FK -> product(product_id), 
+    product_quantity INT,
+    created_at, updated_at
+)
+
+5) order (
+    order_id PK,
+    user_id FK -> user(user_id), 
+    total_amount, 
+    payment_id FK -> payment(payment_id), 
+    order_date, 
+    order_status ENUM (pending, confirmed, shipped, delivered, cancelled)
+)
+
+6) order_item ( SPLIT from `order` to allow multiple products per order )
+    order_id FK -> order(order_id), 
+    product_id FK -> product(product_id), 
+    product_quantity INT, 
+    price_at_order_time,
+    PRIMARY KEY (order_id, product_id)
+
+7) payment (
+    payment_id PK, 
+    user_id FK -> user(user_id), 
+    amount, 
+    payment_mode ENUM (UPI, card, cod), 
+    payment_status ENUM (pending, success, failed), 
+    payment_date
+)
+
+8) delivery (
+    delivery_id PK,
+    order_id FK -> order(order_id), 
+    delivery_vendor, 
+    delivery_date
+)
 
 # Pages
-    1) auth (signup + login)
-        // 1.1) Google OAuth
-        1.2) Email + password (username, address, phone number)
-    2) home ( lists all available medicines )
-    3) user profile
-        3.1) orders
-    4) product (product details)
-    5) cart
-    6) payment + checkout
+1) auth (signup + login)
+    - 1.1) Google OAuth (use Firebase/Auth0 later)
+    - 1.2) Email + password, with name, address, phone
 
+2) home
+    - List all medicines (use infinite scroll or pagination)
+    - Filters: disease_category, company, product_type, trending
+
+3) product page (dynamic route `/product/:slug`)
+    - Show product details + related products + add to cart
+
+4) cart
+    - List products + quantities
+    - Option to remove/update
+    - CTA: Proceed to Checkout
+
+5) payment + checkout
+    - Select address (auto-filled from profile)
+    - Select payment method (UPI, COD)
+    - Order summary
+    - Submit payment
+
+6) user profile
+    - View & update details
+    - View order history
+    - Change password, profile pic
 
 
 # APIs
