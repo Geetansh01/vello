@@ -5,6 +5,13 @@ from rest_framework import status
 from .serializers import UserProfileSerializer
 from .models import UserProfile
 
+class GetProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profile = request.user.userprofile
+        serializer = UserProfileSerializer(profile)
+        return Response(serializer.data)
 
 class ProfileStatusView(APIView):
     permission_classes = [IsAuthenticated]
