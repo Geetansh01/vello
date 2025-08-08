@@ -10,7 +10,17 @@ from .email import send_otp_email
 from .models import PasswordResetOTP, CustomUser
 from rest_framework.permissions import AllowAny
 from django.utils import timezone
+from rest_framework.permissions import IsAuthenticated
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from django.contrib.auth import get_user_model
+from django.conf import settings
+import os
+GOOGLE_CLIENT_ID = os.getenv("CLIENT_ID")
 
+from userprofile.models import UserProfile
+
+User = get_user_model()
 
 
 class RegisterView(APIView):
@@ -127,3 +137,47 @@ class CustomLoginView(APIView):
             "access": str(refresh.access_token),
             "refresh": str(refresh)
         }, status=status.HTTP_200_OK)
+    
+
+class GoogleLoginJWTView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []  # disable auth for login
+
+    def post(self, request):
+        token = request.data.get("access_token")
+        if not token:
+            return Response({"error": "Token missing"}, status=400)
+
+        try:
+            # 🔐 Verify token using Google's public keys
+            idinfo = id_token.verify_oauth2_token(
+                token,
+                requests.Request(),
+                GOOGLE_CLIENT_ID
+            )
+
+            email = idinfo["email"]
+            given_name = idinfo.get("given_name", "")
+            family_name = idinfo.get("family_name", "")
+
+            # 👤 Get or create the user
+            user, _ = CustomUser.objects.get_or_create(email=email)
+
+            # 🧾 Create profile only if it doesn't exist
+            UserProfile.objects.get_or_create(
+                user=user,
+                defaults={"name": f"{given_name} {family_name}"}
+            )
+
+            # 🔁 Create JWT tokens
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+            })
+
+        except ValueError:
+            return Response({"error": "Invalid token"}, status=400)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)

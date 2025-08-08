@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -14,11 +15,14 @@ import OrderSuccessPage from './pages/OrderSuccessPage';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 
+// Load from env (recommended) or paste directly
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "your-client-id.apps.googleusercontent.com";
+
 export default function App() {
   const location = useLocation();
 
   return (
-    <>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           {/* Public Routes with Layout */}
@@ -39,6 +43,6 @@ export default function App() {
           <Route path="/order-success" element={<ProtectedRoute><OrderSuccessPage /></ProtectedRoute>} />
         </Routes>
       </AnimatePresence>
-    </>
+    </GoogleOAuthProvider>
   );
 }

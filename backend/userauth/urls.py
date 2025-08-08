@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from .views import RegisterView, LogoutView, ForgotPasswordView, VerifyOTPAndResetPasswordView, CustomLoginView
+from .views import RegisterView, LogoutView, ForgotPasswordView, VerifyOTPAndResetPasswordView, CustomLoginView, GoogleLoginJWTView
 
 urlpatterns = [
     path('signup/', RegisterView.as_view(), name='signup'),
@@ -15,5 +15,8 @@ urlpatterns = [
 
     path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
     path('reset-password/', VerifyOTPAndResetPasswordView.as_view(), name='reset_password'),
+
+    path('google/token/', GoogleLoginJWTView.as_view(), name='google-jwt'),
+
 
 ]

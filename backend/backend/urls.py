@@ -21,9 +21,27 @@ from django.conf.urls.static import static
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+# from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+# from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+# from dj_rest_auth.registration.views import SocialLoginView
+
+# class GoogleLogin(SocialLoginView):
+#     adapter_class = GoogleOAuth2Adapter
+#     client_class = OAuth2Client
+#     callback_url = "http://localhost:5173"  # Frontend URL after auth
+
 urlpatterns = [
 
     path('admin/', admin.site.urls),
+    
+    # dj-rest-auth URLs
+    # path('auth/', include('dj_rest_auth.urls')),  # login/logout/password reset
+    # path('auth/registration/', include('dj_rest_auth.registration.urls')),  # signup
+    # path('auth/social/', include('allauth.socialaccount.urls')),  # Google OAuth
+
+    # path('auth/google/', GoogleLogin.as_view(), name='google_login'),
+    # path("auth/", include("allauth.urls")),
+
 
     path('api/', include('userauth.urls')),
     path('api/', include('userprofile.urls')),

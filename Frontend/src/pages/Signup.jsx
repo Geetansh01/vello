@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useUser } from '../contexts/UserContext'
 import Toast from '../components/Toast'
+import { GoogleLogin } from '@react-oauth/google'
+
 
 export default function Signup() {
   const [form, setForm] = useState({
