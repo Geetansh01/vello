@@ -1,0 +1,75 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django-related files
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+*.sqlite3
+
+# Media and Static
+/media/
+staticfiles/
+static/
+
+# Environment
+.env
+.env.*
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# VSCode or JetBrains IDE
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Pip and build
+pip-log.txt
+pip-delete-this-directory.txt
+dist/
+build/
+*.egg-info/
+
+# Coverage reports
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+.cache/
+
+# Pytest
+pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints
+
+# MySQL/PostgreSQL dumps
+*.sql
+*.dump
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Migrations (optional, if you prefer not to version them)
+# ** Uncomment if needed **
+# */migrations/
+# !*/migrations/__init__.py
+
+# the uploaded files in help section
+backend/media/documents/
+
