@@ -75,7 +75,11 @@ class ForgotPasswordView(APIView):
             send_otp_email(user.email, code)
             return Response({"message": "OTP sent to your email"}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"error": "Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            import traceback
+            print("Email sending failed:", str(e))
+            traceback.print_exc()
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class VerifyOTPAndResetPasswordView(APIView):
     permission_classes = [AllowAny]
