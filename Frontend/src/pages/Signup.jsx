@@ -1,141 +1,85 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { useUser } from '../contexts/UserContext'
-import Toast from '../components/Toast'
-import { GoogleLogin } from '@react-oauth/google'
-
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useUser } from '../contexts/UserContext';
+import Toast from '../components/Toast';
 
 export default function Signup() {
-  const [form, setForm] = useState({
-    name: '', email: '', password: '', address: '', phone: ''
-  })
-  const [loading, setLoading] = useState(false)
-  const [toast, setToast] = useState({ message: '', type: 'info' })
-  const { signup } = useUser()
-  const navigate = useNavigate()
+  const [form, setForm] = useState({ name: '', email: '', password: '', address: '', phone: '' });
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState({ message: '', type: 'info' });
+  const { signup } = useUser();
+  const navigate = useNavigate();
 
   const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const validate = () => {
-    if (!form.name || !form.email || !form.password || !form.address || !form.phone)
-      return 'Please fill all fields.'
-    if (!/\S+@\S+\.\S+/.test(form.email))
-      return 'Invalid email address.'
-    if (form.password.length < 6)
-      return 'Password must be at least 6 characters.'
-    if (!/^\d{10,}$/.test(form.phone))
-      return 'Phone must be at least 10 digits.'
-    return ''
-  }
+    if (!form.email || !form.password) return 'Please fill email and password.';
+    if (!/\S+@\S+\.\S+/.test(form.email)) return 'Invalid email address.';
+    if (form.password.length < 6) return 'Password must be at least 6 characters.';
+    return '';
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setToast({ message: '', type: 'info' })
-    const error = validate()
+    e.preventDefault();
+    setLoading(true);
+    setToast({ message: '', type: 'info' });
+
+    const error = validate();
     if (error) {
-      setToast({ message: error, type: 'error' })
-      setLoading(false)
-      return
+      setToast({ message: error, type: 'error' });
+      setLoading(false);
+      return;
     }
+
     try {
-      await signup(form)
-      setToast({ message: 'Signup successful!', type: 'success' })
-      setTimeout(() => navigate('/login'), 1200)
+      // Note: The signup API in your Postman collection only takes email and password.
+      // Other fields (name, address, phone) will need an "update profile" endpoint later.
+      await signup(form.email, form.password);
+      setToast({ message: 'Signup successful! Redirecting...', type: 'success' });
+      setTimeout(() => navigate('/'), 1500); // Redirect to home on successful signup and login
     } catch (err) {
-      setToast({ message: 'Signup failed.', type: 'error' })
+      const errorMessage = err.response?.data?.detail || 'Signup failed. The user may already exist.';
+      setToast({ message: errorMessage, type: 'error' });
+      setLoading(false);
     }
-    setLoading(false)
-  }
+  };
 
   return (
-    <div className="flex items-center justify-center min-h-[80vh] bg-gradient-to-br from-green-100 to-blue-200">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white p-4">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-white">Create a new account</h2>
+        </div>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {/* Note: name, address, phone inputs are here for UI, but not sent in signup API call */}
+          <input type="text" name="name" placeholder="Full Name" value={form.name} onChange={handleChange} className="w-full p-3 bg-gray-700 rounded-md" />
+          <input type="email" name="email" placeholder="Email Address" required value={form.email} onChange={handleChange} className="w-full p-3 bg-gray-700 rounded-md" />
+          <input type="password" name="password" placeholder="Password" required value={form.password} onChange={handleChange} className="w-full p-3 bg-gray-700 rounded-md" />
+          <input type="text" name="address" placeholder="Address" value={form.address} onChange={handleChange} className="w-full p-3 bg-gray-700 rounded-md" />
+          <input type="text" name="phone" placeholder="Phone Number" value={form.phone} onChange={handleChange} className="w-full p-3 bg-gray-700 rounded-md" />
+          
+          <div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 disabled:bg-gray-500"
+            >
+              {loading ? 'Signing Up...' : 'Sign Up'}
+            </button>
+          </div>
+        </form>
+        <div className="text-center">
+          <p className="text-sm">
+            Already have an account?{' '}
+            <Link to="/login" className="font-medium text-teal-400 hover:text-teal-300">
+              Log in
+            </Link>
+          </p>
+        </div>
+      </div>
       <Toast message={toast.message} type={toast.type} />
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md animate-fade-in"
-        style={{ animation: toast.type === 'success' ? 'success-bounce 0.7s' : 'fade-in 0.7s' }}
-      >
-        <h2 className="text-2xl font-bold mb-6 text-green-700">Sign Up</h2>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Name</label>
-          <input
-            name="name"
-            type="text"
-            className="w-full px-3 py-2 border rounded focus:outline-green-400"
-            value={form.name}
-            onChange={handleChange}
-            autoFocus
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Email</label>
-          <input
-            name="email"
-            type="email"
-            className="w-full px-3 py-2 border rounded focus:outline-green-400"
-            value={form.email}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Password</label>
-          <input
-            name="password"
-            type="password"
-            className="w-full px-3 py-2 border rounded focus:outline-green-400"
-            value={form.password}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Address</label>
-          <input
-            name="address"
-            type="text"
-            className="w-full px-3 py-2 border rounded focus:outline-green-400"
-            value={form.address}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-6">
-          <label className="block mb-1 font-medium">Phone</label>
-          <input
-            name="phone"
-            type="tel"
-            className="w-full px-3 py-2 border rounded focus:outline-green-400"
-            value={form.phone}
-            onChange={handleChange}
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-        >
-          {loading ? 'Signing up...' : 'Sign Up'}
-        </button>
-        <div className="mt-6 text-center">
-          <span>Already have an account? </span>
-          <Link to="/login" className="text-green-600 hover:underline">Login</Link>
-        </div>
-      </form>
-      <style>
-        {`
-          @keyframes fade-in {
-            from { opacity: 0; transform: scale(0.95);}
-            to { opacity: 1; transform: scale(1);}
-          }
-          @keyframes success-bounce {
-            0% { transform: scale(1);}
-            30% { transform: scale(1.1);}
-            60% { transform: scale(0.95);}
-            100% { transform: scale(1);}
-          }
-        `}
-      </style>
     </div>
-  )
+  );
 }

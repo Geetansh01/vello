@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { motion } from 'framer-motion';
-import { GoogleLogin } from '@react-oauth/google';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useUser();
@@ -23,10 +22,10 @@ export default function Login() {
 
     try {
       await login(email, password);
-      // Redirect to the page the user was trying to access, or home
       navigate(from, { replace: true });
     } catch (err) {
-      setError('Failed to log in. Please check your credentials.');
+      const errorMessage = err.response?.data?.detail || 'Login failed. Please check your credentials.';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -34,17 +33,17 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white p-4 bg-gradient-to-br from-gray-900 via-gray-800 to-teal-900">
-      <motion.div
+      <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <Link to="/" className="text-white font-bold text-5xl">
-            Vello<span className="text-teal-400">.</span>
-          </Link>
-          <p className="text-gray-400 mt-2">Welcome back! Please sign in to your account.</p>
+            <Link to="/" className="text-white font-bold text-5xl">
+              Vello<span className="text-teal-400">.</span>
+            </Link>
+            <p className="text-gray-400 mt-2">Welcome back! Please sign in to your account.</p>
         </div>
 
         <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl shadow-2xl p-8">
@@ -63,7 +62,12 @@ export default function Login() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300">Password</label>
+                <div className="flex justify-between items-center">
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-300">Password</label>
+                    <Link to="/forgot-password" className="text-sm text-teal-400 hover:text-teal-300">
+                        Forgot Password?
+                    </Link>
+                </div>
               <input
                 id="password"
                 name="password"
@@ -75,7 +79,7 @@ export default function Login() {
                 className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm py-3 px-4 text-white focus:ring-teal-500 focus:border-teal-500"
               />
             </div>
-
+            
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
 
             <div>
@@ -88,30 +92,6 @@ export default function Login() {
               </button>
             </div>
           </form>
-
-          <GoogleLogin
-            onSuccess={async credentialResponse => {
-              try {
-                const res = await fetch("http://localhost:8000/api/google/token/", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ access_token: credentialResponse.credential }),
-                });
-                const data = await res.json();
-                if (res.ok) {
-                  await login(data.access, data.refresh);
-                  navigate(from, { replace: true });
-                } else {
-                  throw new Error(data?.detail || "Google login failed.");
-                }
-              } catch (err) {
-                setError("Google login failed.");
-              }
-            }}
-            onError={() => setError("Google login error")}
-          />
-
-
         </div>
 
         <p className="mt-8 text-center text-sm text-gray-400">

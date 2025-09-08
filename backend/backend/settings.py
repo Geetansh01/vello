@@ -192,12 +192,12 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'DEFAULT_THROTTLE_CLASSES': [
-        'userauth.throttles.OTPThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'otp': '1/minute',  # ✅ 1 request per email per minute
-    },
+    # 'DEFAULT_THROTTLE_CLASSES': [
+    #     'userauth.throttles.OTPThrottle',
+    # ],
+    # 'DEFAULT_THROTTLE_RATES': {
+    #     'otp': '1/minute',  # ✅ 1 request per email per minute
+    # },
 }
 
 # ✅ Optional: Customize JWT behavior
