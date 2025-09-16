@@ -68,6 +68,9 @@ INSTALLED_APPS = [
     
     'userauth',
     'userprofile',
+    'orders',
+    'products',
+    'cart',
 ]
 
 MIDDLEWARE = [
@@ -81,7 +84,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',  
     'django.middleware.common.CommonMiddleware',
-    # 'userprofile.middleware.SessionActivityMiddleware', 
+    # 'userprofile.middleware.SessionActivityMiddleware',
+    # 'corsheaders.middleware.CorsMiddleware',  # <-- this should be at the top
+ 
 ]
 
 
@@ -196,7 +201,7 @@ REST_FRAMEWORK = {
         'userauth.throttles.OTPThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'otp': '1/minute',  # ✅ 1 request per email per minute
+        'otp': '1/second',  # ✅ 1 request per email per minute
     },
 }
 
@@ -221,7 +226,7 @@ SIMPLE_JWT = {
 
 
 
-ORG_NAME = "VELLO"
+ORG_NAME = "Wellmed"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -244,11 +249,14 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('CLIENT_SECRET')
 
 SITE_ID = 1
 
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_USERNAME_REQUIRED = False
+# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 
+# ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+
+ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 
 SOCIALACCOUNT_PROVIDERS = {
