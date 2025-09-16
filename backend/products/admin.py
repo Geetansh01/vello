@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django import forms
-from django.db import models
 from .models import (
     Product,
+    ProductImage,
     ProductBenefit,
     ProductSuitableFor,
     ProductDosage,
@@ -10,25 +10,61 @@ from .models import (
     ProductSideEffect,
     ProductKeyIngredient,
 )
+import asyncio
+import httpx
+from dateutil.parser import parse as parse_datetime
 
-# --------------------------
-# Custom Form for Product
-# --------------------------
-class ProductAdminForm(forms.ModelForm):
+UPLOAD_URL = "https://image.wellmed.workers.dev/api/upload"
+
+# Async image uploader function
+async def async_upload_image(file):
+    timeout = httpx.Timeout(60.0)
+    async with httpx.AsyncClient(timeout=timeout) as client:
+        files = {"photo": (file.name, file.read(), file.content_type)}
+        response = await client.post(UPLOAD_URL, files=files)
+        response.raise_for_status()
+        return response.json()
+
+# Sync wrapper to call async uploader
+def upload_image(file):
+    return asyncio.run(async_upload_image(file))
+
+# Custom form for ProductImage inline to handle upload and save response
+class ProductImageForm(forms.ModelForm):
+    upload_image = forms.FileField(required=True, label="Upload Image")
+
     class Meta:
-        model = Product
-        fields = "__all__"
+        model = ProductImage
+        fields = []
 
-    # Handle images as newline-separated input
-    def clean_images(self):
-        data = self.cleaned_data.get("images", "")
-        if isinstance(data, str):
-            return [line.strip() for line in data.splitlines() if line.strip()]
-        return data
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        upload_file = self.cleaned_data.get("upload_image")
 
-# --------------------------
-# Inline Models for Related Fields
-# --------------------------
+        if upload_file:
+            result = upload_image(upload_file)
+            res = result.get("result", {})
+            # Save only download, stream, uploaded_at
+            instance.download_url = res.get("links", {}).get("download", "")
+            instance.stream_url = res.get("links", {}).get("stream", "")
+            instance.uploaded_at = parse_datetime(res.get("uploadedAt")) if res.get("uploadedAt") else None
+
+        if commit:
+            instance.save()
+        return instance
+
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    form = ProductImageForm
+    extra = 0
+    readonly_fields = ("download_url", "stream_url", "uploaded_at")
+    fields = ("upload_image", "download_url", "stream_url", "uploaded_at")
+
+    def has_change_permission(self, request, obj=None):
+        # Disable editing after upload (optional)
+        return False
+
+# Other inlines for related models (copy your existing inlines)
 class ProductBenefitInline(admin.TabularInline):
     model = ProductBenefit
     extra = 1
@@ -53,13 +89,8 @@ class ProductKeyIngredientInline(admin.TabularInline):
     model = ProductKeyIngredient
     extra = 1
 
-# --------------------------
-# Product Admin
-# --------------------------
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    form = ProductAdminForm
-
     list_display = (
         "product_id",
         "name",
@@ -75,13 +106,8 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     ordering = ("name",)
 
-    # Show multi-line text areas in admin for JSON fields
-    formfield_overrides = {
-        models.JSONField: {"widget": forms.Textarea(attrs={"rows": 4, "cols": 60})},
-    }
-
-    # Include all related inlines
     inlines = [
+        ProductImageInline,
         ProductBenefitInline,
         ProductSuitableForInline,
         ProductDosageInline,

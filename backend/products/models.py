@@ -9,7 +9,9 @@ class Product(models.Model):
     slug = models.SlugField(unique=True)
     name = models.CharField(max_length=255)
     company = models.CharField(max_length=255)  # Brand / Company
-    disease_category = models.CharField(max_length=255)
+    disease_category = models.CharField(max_length=255, blank=True, null=True)  # e.g., Diabetes, Cardiology
+    returnable = models.BooleanField(default=False)
+    expiry_date = models.DateField(blank=True, null=True)
 
     # Pricing & Stock
     mrp = models.DecimalField(max_digits=10, decimal_places=2)
@@ -17,7 +19,6 @@ class Product(models.Model):
     available_stock = models.BooleanField(default=False)
 
     # Media & Flags
-    images = models.JSONField(default=list)  # List of image URLs
     trending = models.BooleanField(default=False)
 
     # Rich Details
@@ -41,6 +42,16 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.company})"
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE)
+    stream_url = models.URLField(max_length=500)
+    download_url = models.URLField(max_length=500)
+    uploaded_at = models.DateTimeField()
+
+    def __str__(self):
+        return f"Image for {self.product.name} uploaded at {self.uploaded_at}"
+
 
 # --- Related Models ---
 

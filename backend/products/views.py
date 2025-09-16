@@ -9,9 +9,12 @@ from .serializers import (
     ProductDetailSerializer,
     RelatedProductSerializer
 )
+from rest_framework.permissions import AllowAny
 
 
 class ProductListView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request):
         products = Product.objects.all()
         serializer = ProductListSerializer(products, many=True)
@@ -19,13 +22,25 @@ class ProductListView(APIView):
 
 
 class ProductDetailView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request, slug):
         product = get_object_or_404(Product, slug=slug)
+        serializer = ProductDetailSerializer(product)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class ProductDetailByIDView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, product_id):
+        product = get_object_or_404(Product, product_id=product_id)
         serializer = ProductDetailSerializer(product)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class RelatedProductsView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request, slug):
         product = get_object_or_404(Product, slug=slug)
         related_products = Product.objects.filter(
