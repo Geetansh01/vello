@@ -1,12 +1,13 @@
 from django.db import models
 from shortuuid.django_fields import ShortUUIDField
+from django.utils.text import slugify
 
 
 class Product(models.Model):
     # Basic Info
     product_id = ShortUUIDField(unique=True, length=6, max_length=20, alphabet="1234567890")
 
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True)
     name = models.CharField(max_length=255)
     company = models.CharField(max_length=255)  # Brand / Company
     disease_category = models.CharField(max_length=255, blank=True, null=True)  # e.g., Diabetes, Cardiology
@@ -35,6 +36,17 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.name)
+            slug = base_slug
+            counter = 1
+            # Ensure uniqueness
+            while Product.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     # Utility
     def discounted_price(self):

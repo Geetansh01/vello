@@ -103,7 +103,7 @@ class ProductAdmin(admin.ModelAdmin):
     )
     list_filter = ("company", "disease_category", "trending")
     search_fields = ("product_id", "name", "company", "slug")
-    prepopulated_fields = {"slug": ("name",)}
+    readonly_fields = ("slug",)
     ordering = ("name",)
 
     inlines = [
