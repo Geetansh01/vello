@@ -26,24 +26,30 @@ class CreateOrderView(APIView):
             status="Confirmed"
         )
 
+        # Inside the order creation loop
         for item in cart_items:
-            try:
-                product = Product.objects.get(product_id=item["product_id"])
-            except Product.DoesNotExist:
-                return Response({"error": f"Product {item['product_id']} not found"}, status=status.HTTP_400_BAD_REQUEST)
+            product = item.product
 
-            price_after_discount = product.mrp - (product.mrp * product.discount / 100)
-            OrderItem.objects.create(order=order, product=product, qty=item["qty"], price=price_after_discount)
-            total += price_after_discount * item["qty"]
+            # Check if stock is available (optional safety check)
+            if product.available_stock < item.quantity:
+                return Response({"error": f"Not enough stock for {product.name}"}, status=400)
 
-            # Reduce stock
-            product.available_stock -= item["qty"]
+            OrderItem.objects.create(
+                order=order,
+                product=product,
+                qty=item.quantity,
+                price=product.discounted_price()
+            )
+
+            # Decrease stock
+            product.available_stock -= item.quantity
             product.save()
+
 
         order.total = total
         order.save()
 
-        return Response({"message": "Order placed successfully", "order_id": order.id}, status=status.HTTP_201_CREATED)
+        return Response({"message": "Order placed successfully", "order_id": order.order_id}, status=status.HTTP_201_CREATED)
 
 
 class UserOrdersView(APIView):
@@ -60,9 +66,35 @@ class OrderDetailView(APIView):
 
     def get(self, request, order_id):
         try:
-            order = Order.objects.get(id=order_id, user=request.user)
+            order = Order.objects.get(order_id=order_id, user=request.user)
         except Order.DoesNotExist:
             return Response({"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = OrderSerializer(order)
         return Response(serializer.data)
+
+class CancelOrderView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, order_id):
+        order = get_object_or_404(Order, order_id=order_id, user=request.user)
+
+        if order.status in ["Shipped", "Delivered"]:
+            return Response({"error": "Cannot cancel an order that is already shipped or delivered."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        reason = request.data.get("reason", "")
+
+        # Update order status
+        order.status = "Cancelled"
+        order.cancellation_reason = reason
+        order.save()
+
+        # 🔄 Restore stock for each item
+        for item in order.items.all():
+            product = item.product
+            product.available_stock += item.qty
+            product.save()
+
+        return Response({"message": "Order cancelled and stock restored."}, status=status.HTTP_200_OK)
+

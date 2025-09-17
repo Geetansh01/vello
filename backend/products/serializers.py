@@ -7,7 +7,8 @@ from .models import (
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ["stream_url", "download_url", "uploaded_at"]
+        fields = ["stream_url", "download_url", "uploaded_at", "image_type"]
+
 
 # For home/product listing
 class ProductListSerializer(serializers.ModelSerializer):

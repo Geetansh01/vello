@@ -44,8 +44,19 @@ class UpdateCartItemView(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, item_id):
-        cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
-        quantity = int(request.data.get("quantity", 1))
+        cart_item = get_object_or_404(CartItem, cart_item_id=item_id, user=request.user)
+
+        if "quantity" not in request.data:
+            return Response({"error": "Quantity field is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            quantity = int(request.data.get("quantity"))
+        except (ValueError, TypeError):
+            return Response({"error": "Quantity must be a valid integer"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if quantity < 1:
+            return Response({"error": "Quantity must be at least 1"}, status=status.HTTP_400_BAD_REQUEST)
+
         cart_item.quantity = quantity
         cart_item.save()
         return Response({"message": "Cart item updated"}, status=status.HTTP_200_OK)

@@ -31,7 +31,7 @@ def upload_image(file):
 
 # Custom form for ProductImage inline to handle upload and save response
 class ProductImageForm(forms.ModelForm):
-    upload_image = forms.FileField(required=True, label="Upload Image")
+    upload_image = forms.FileField(required=False, label="Upload Image")  # Made optional
 
     class Meta:
         model = ProductImage
@@ -44,10 +44,10 @@ class ProductImageForm(forms.ModelForm):
         if upload_file:
             result = upload_image(upload_file)
             res = result.get("result", {})
-            # Save only download, stream, uploaded_at
             instance.download_url = res.get("links", {}).get("download", "")
             instance.stream_url = res.get("links", {}).get("stream", "")
-            instance.uploaded_at = parse_datetime(res.get("uploadedAt")) if res.get("uploadedAt") else None
+            uploaded_at_str = res.get("uploadedAt")
+            instance.uploaded_at = parse_datetime(uploaded_at_str) if uploaded_at_str else None
 
         if commit:
             instance.save()
@@ -58,13 +58,12 @@ class ProductImageInline(admin.TabularInline):
     form = ProductImageForm
     extra = 0
     readonly_fields = ("download_url", "stream_url", "uploaded_at")
-    fields = ("upload_image", "download_url", "stream_url", "uploaded_at")
+    fields = ("upload_image", "image_type", "download_url", "stream_url", "uploaded_at")
 
     def has_change_permission(self, request, obj=None):
-        # Disable editing after upload (optional)
-        return False
+        # Allow editing to update image_type
+        return True
 
-# Other inlines for related models (copy your existing inlines)
 class ProductBenefitInline(admin.TabularInline):
     model = ProductBenefit
     extra = 1
@@ -99,6 +98,7 @@ class ProductAdmin(admin.ModelAdmin):
         "mrp",
         "discount",
         "available_stock",
+        "is_available_status",  # <-- dynamic availability here
         "trending",
     )
     list_filter = ("company", "disease_category", "trending")
@@ -115,3 +115,8 @@ class ProductAdmin(admin.ModelAdmin):
         ProductSideEffectInline,
         ProductKeyIngredientInline,
     ]
+
+    def is_available_status(self, obj):
+        return obj.is_available
+    is_available_status.boolean = True  # show icon
+    is_available_status.short_description = "Available"

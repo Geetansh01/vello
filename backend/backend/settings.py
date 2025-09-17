@@ -268,3 +268,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 SOCIALACCOUNT_ADAPTER = 'userauth.adapters.CustomSocialAccountAdapter'
 
+
+# Payment Gateway (Razorpay)
+STRIPE_SECRET_KEY = "sk_test_..."  # your secret key
+STRIPE_PUBLISHABLE_KEY = "pk_test_..."  # your public key

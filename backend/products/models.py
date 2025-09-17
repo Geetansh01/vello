@@ -17,7 +17,8 @@ class Product(models.Model):
     # Pricing & Stock
     mrp = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.PositiveIntegerField(default=0)  # Percentage discount
-    available_stock = models.BooleanField(default=False)
+    available_stock = models.PositiveIntegerField(default=0, null=True, blank=True)
+    # is_available = models.BooleanField(default=False)
 
     # Media & Flags
     trending = models.BooleanField(default=False)
@@ -55,14 +56,34 @@ class Product(models.Model):
     def __str__(self):
         return f"{self.name} ({self.company})"
 
+    @property
+    def is_available(self):
+        return self.available_stock > 0
+        
 class ProductImage(models.Model):
+    IMAGE_TYPE_CHOICES = [
+        ("cover", "Cover"),
+        ("square", "Square"),
+        ("thumbnail", "Thumbnail"),
+        ("zoom", "Zoom"),
+        ("gallery", "Gallery"),
+        ("banner", "Banner"),
+        # Add any other types you need
+    ]
+
     product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE)
     stream_url = models.URLField(max_length=500)
     download_url = models.URLField(max_length=500)
     uploaded_at = models.DateTimeField()
 
+    image_type = models.CharField(
+        max_length=20,
+        choices=IMAGE_TYPE_CHOICES,
+        default="gallery"  # set default as needed
+    )
+
     def __str__(self):
-        return f"Image for {self.product.name} uploaded at {self.uploaded_at}"
+        return f"{self.image_type} image for {self.product.name} uploaded at {self.uploaded_at}"
 
 
 # --- Related Models ---
