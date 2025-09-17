@@ -14,7 +14,7 @@ from rest_framework.permissions import AllowAny
 
 class ProductListView(APIView):
     permission_classes = [AllowAny]
-
+    serializer_class = ProductListSerializer
     def get(self, request):
         products = Product.objects.all()
         serializer = ProductListSerializer(products, many=True)

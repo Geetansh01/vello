@@ -7,6 +7,7 @@ from .models import UserProfile
 
 class GetProfileView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = UserProfileSerializer
 
     def get(self, request):
         profile = request.user.userprofile
@@ -15,6 +16,7 @@ class GetProfileView(APIView):
 
 class ProfileStatusView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = UserProfileSerializer
 
     def get(self, request):
         profile = request.user.userprofile
@@ -27,6 +29,7 @@ class ProfileStatusView(APIView):
 
 class UpdateProfileView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = UserProfileSerializer
 
     def put(self, request):
         profile = request.user.userprofile
@@ -35,9 +38,10 @@ class UpdateProfileView(APIView):
             serializer.save()
             return Response({"message": "Profile updated successfully"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 class DeleteProfileView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = None  # no serializer needed here
 
     def delete(self, request):
         user = request.user
@@ -46,6 +50,7 @@ class DeleteProfileView(APIView):
 
 class ActiveTimeView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = None  # no serializer needed here
 
     def get(self, request):
         profile = request.user.userprofile

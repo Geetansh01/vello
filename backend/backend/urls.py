@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 # from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 # from allauth.socialaccount.providers.oauth2.client import OAuth2Client
@@ -41,6 +42,12 @@ urlpatterns = [
 
     # path('auth/google/', GoogleLogin.as_view(), name='google_login'),
     # path("auth/", include("allauth.urls")),
+
+
+    # API schema and documentation
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
 
     path('api/', include('userauth.urls')),

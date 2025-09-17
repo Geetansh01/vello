@@ -1,4 +1,3 @@
-# cart/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,15 +9,17 @@ from .serializers import CartItemSerializer
 
 class CartView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = CartItemSerializer  # Added serializer_class
 
     def get(self, request):
         items = CartItem.objects.filter(user=request.user)
-        serializer = CartItemSerializer(items, many=True)
+        serializer = self.serializer_class(items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class AddToCartView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = None  # No serializer needed here
 
     def post(self, request):
         product_id = request.data.get("product_id")
@@ -42,6 +43,7 @@ class AddToCartView(APIView):
 
 class UpdateCartItemView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = None  # No serializer needed here
 
     def put(self, request, item_id):
         cart_item = get_object_or_404(CartItem, cart_item_id=item_id, user=request.user)
@@ -64,6 +66,7 @@ class UpdateCartItemView(APIView):
 
 class RemoveFromCartView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = None  # No serializer needed here
 
     def delete(self, request, item_id):
         cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)

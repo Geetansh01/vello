@@ -52,6 +52,7 @@ INSTALLED_APPS = [
 
     # Added apps
     'rest_framework',
+    'drf_spectacular',
     'rest_framework.authtoken',
     # 'dj_rest_auth',
     # 'dj_rest_auth.registration',
@@ -268,6 +269,13 @@ SOCIALACCOUNT_PROVIDERS = {
 
 SOCIALACCOUNT_ADAPTER = 'userauth.adapters.CustomSocialAccountAdapter'
 
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Wellmed API',
+    'DESCRIPTION': 'API documentation for wellmed backend',
+    'VERSION': '1.0.0',
+    # You can add more spectacular settings here if needed
+}
 
 # Payment Gateway (Razorpay)
 STRIPE_SECRET_KEY = "sk_test_..."  # your secret key
