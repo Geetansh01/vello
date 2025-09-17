@@ -9,7 +9,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 class Order(models.Model):
-    order_id = ShortUUIDField(unique=True, length=17, max_length=17, prefix="id_", alphabet="1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    order_id = ShortUUIDField(unique=True, length=17, max_length=25, prefix="id_", alphabet="1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
     STATUS_CHOICES = [
         ("Pending", "Pending"),
@@ -35,7 +35,7 @@ class Order(models.Model):
     delivery_otp = models.CharField(max_length=6, blank=True, null=True)
 
     def __str__(self):
-        return f"Order {self.order_id} - {self.user.username}"
+        return f"Order {self.order_id} - {self.user.email}"
 
     def set_delivery_details(self, user_pincode):
         if user_pincode == "110040":

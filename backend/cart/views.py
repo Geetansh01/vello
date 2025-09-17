@@ -66,9 +66,8 @@ class UpdateCartItemView(APIView):
 
 class RemoveFromCartView(APIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = None  # No serializer needed here
 
     def delete(self, request, item_id):
-        cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
+        cart_item = get_object_or_404(CartItem, cart_item_id=item_id, user=request.user)
         cart_item.delete()
         return Response({"message": "Item removed from cart"}, status=status.HTTP_204_NO_CONTENT)

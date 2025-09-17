@@ -1,4 +1,5 @@
 # products/views.py
+from rest_framework import generics, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,15 +11,17 @@ from .serializers import (
     RelatedProductSerializer
 )
 from rest_framework.permissions import AllowAny
+from .pagination import StandardResultsSetPagination
 
 
-class ProductListView(APIView):
-    permission_classes = [AllowAny]
+class ProductListView(generics.ListAPIView):
+    queryset = Product.objects.all().order_by("-created_at")
     serializer_class = ProductListSerializer
-    def get(self, request):
-        products = Product.objects.all()
-        serializer = ProductListSerializer(products, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name", "company", "disease_category", "description"]
+    ordering_fields = ["mrp", "discount", "created_at"]
+    permission_classes = [AllowAny]
 
 
 class ProductDetailView(APIView):

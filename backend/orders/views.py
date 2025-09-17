@@ -7,19 +7,18 @@ from django.shortcuts import get_object_or_404
 from .models import Order, OrderItem
 from products.models import Product
 from .serializers import OrderSerializer
+from cart.models import CartItem
 
 class CreateOrderView(APIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = None  # No serializer used directly
 
     def post(self, request):
-        cart_items = request.data.get("items", [])
-        payment_method = request.data.get("payment_method")
+        cart_items = CartItem.objects.filter(user=request.user)
+        payment_method = request.data.get("payment_method", "COD")
 
-        if not cart_items:
+        if not cart_items.exists():
             return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
 
-        total = 0
         order = Order.objects.create(
             user=request.user,
             total=0,
@@ -28,39 +27,36 @@ class CreateOrderView(APIView):
             status="Confirmed"
         )
 
+        total = 0
         for item in cart_items:
-            product = item.get("product")
-            quantity = item.get("quantity", 0)
+            product = item.product
 
-            if not product or quantity <= 0:
-                return Response({"error": "Invalid product or quantity"}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Assuming product is product ID, so fetch product instance
-            try:
-                product_obj = Product.objects.get(product_id=product)
-            except Product.DoesNotExist:
-                return Response({"error": f"Product with id {product} not found."}, status=status.HTTP_400_BAD_REQUEST)
-
-            if product_obj.available_stock < quantity:
-                return Response({"error": f"Not enough stock for {product_obj.name}"}, status=400)
+            if product.available_stock < item.quantity:
+                return Response({"error": f"Not enough stock for {product.name}"}, status=400)
 
             OrderItem.objects.create(
                 order=order,
-                product=product_obj,
-                qty=quantity,
-                price=product_obj.discounted_price()
+                product=product,
+                qty=item.quantity,
+                price=product.discounted_price()
             )
 
-            total += product_obj.discounted_price() * quantity
+            total += product.discounted_price() * item.quantity
 
-            product_obj.available_stock -= quantity
-            product_obj.save()
+            # reduce stock
+            product.available_stock -= item.quantity
+            product.save()
 
         order.total = total
         order.save()
 
-        return Response({"message": "Order placed successfully", "order_id": order.order_id}, status=status.HTTP_201_CREATED)
+        # ✅ Clear cart after order
+        cart_items.delete()
 
+        return Response(
+            {"message": "Order placed successfully", "order_id": order.order_id},
+            status=status.HTTP_201_CREATED
+        )
 
 class UserOrdersView(APIView):
     permission_classes = [IsAuthenticated]
