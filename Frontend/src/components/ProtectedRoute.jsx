@@ -1,8 +1,9 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { useUser } from '../contexts/UserContext';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../store/slices/userSlice';
 
 export default function ProtectedRoute({ children }) {
-  const { user } = useUser();
+  const user = useSelector(selectUser);
   const location = useLocation();
 
   if (!user) {

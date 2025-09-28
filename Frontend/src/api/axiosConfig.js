@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api', // Your Django backend URL
+  baseURL: 'https://vello-alpha.vercel.app/api',
+  timeout: 15000, // 15 second timeout
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -28,6 +29,17 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
+    // Handle timeout errors
+    if (error.code === 'ECONNABORTED') {
+      console.error('Request timeout');
+      return Promise.reject(new Error('Request timeout. Please try again.'));
+    }
+    
+    if (!error.response) {
+      console.error('Network error');
+      return Promise.reject(new Error('Network error. Please check your connection.'));
+    }
+    
     const originalRequest = error.config;
     // Check if the error is 401 and it's not a retry request
     if (error.response.status === 401 && !originalRequest._retry) {
@@ -36,7 +48,7 @@ api.interceptors.response.use(
 
       if (refreshToken) {
         try {
-          const response = await axios.post('http://127.0.0.1:8000/api/token/refresh/', {
+          const response = await axios.post('https://vello-alpha.vercel.app/api/token/refresh/', {
             refresh: refreshToken,
           });
           const newAccessToken = response.data.access;

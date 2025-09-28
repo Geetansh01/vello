@@ -32,7 +32,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white p-4 bg-gradient-to-br from-gray-900 via-gray-800 to-teal-900">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -40,16 +40,19 @@ export default function Login() {
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-            <Link to="/" className="text-white font-bold text-5xl">
-              Vello<span className="text-teal-400">.</span>
+            <Link to="/" className="flex items-center justify-center space-x-2 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-2xl">W</span>
+              </div>
+              <span className="text-3xl font-bold text-gray-900">WellMed</span>
             </Link>
-            <p className="text-gray-400 mt-2">Welcome back! Please sign in to your account.</p>
+            <p className="text-gray-600 mt-2">Welcome back! Please sign in to your account.</p>
         </div>
 
-        <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl shadow-2xl p-8">
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300">Email Address</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
               <input
                 id="email"
                 name="email"
@@ -58,13 +61,14 @@ export default function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm py-3 px-4 text-white focus:ring-teal-500 focus:border-teal-500"
+                className="mt-1 block w-full bg-gray-50 border border-gray-200 rounded-xl shadow-sm py-3 px-4 text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Enter your email"
               />
             </div>
             <div>
                 <div className="flex justify-between items-center">
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-300">Password</label>
-                    <Link to="/forgot-password" className="text-sm text-teal-400 hover:text-teal-300">
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+                    <Link to="/forgot-password" className="text-sm text-purple-600 hover:text-purple-700">
                         Forgot Password?
                     </Link>
                 </div>
@@ -76,17 +80,18 @@ export default function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm py-3 px-4 text-white focus:ring-teal-500 focus:border-teal-500"
+                className="mt-1 block w-full bg-gray-50 border border-gray-200 rounded-xl shadow-sm py-3 px-4 text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Enter your password"
               />
             </div>
             
-            {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+            {error && <p className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg">{error}</p>}
 
             <div>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 focus:ring-offset-gray-900 transition-colors disabled:bg-gray-500"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors disabled:bg-gray-400"
               >
                 {isLoading ? 'Signing In...' : 'Sign In'}
               </button>
@@ -94,9 +99,9 @@ export default function Login() {
           </form>
         </div>
 
-        <p className="mt-8 text-center text-sm text-gray-400">
+        <p className="mt-8 text-center text-sm text-gray-600">
           Not a member?{' '}
-          <Link to="/signup" className="font-medium text-teal-400 hover:text-teal-300">
+          <Link to="/signup" className="font-medium text-purple-600 hover:text-purple-700">
             Sign up now
           </Link>
         </p>
