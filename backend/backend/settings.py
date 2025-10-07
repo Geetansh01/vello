@@ -207,6 +207,10 @@ REST_FRAMEWORK = {
     # 'DEFAULT_THROTTLE_RATES': {
     #     'otp': '1/minute',  # ✅ 1 request per email per minute
     # },
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+
 }
 
 # ✅ Optional: Customize JWT behavior
