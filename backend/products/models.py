@@ -13,6 +13,7 @@ class Product(models.Model):
     disease_category = models.CharField(max_length=255, blank=True, null=True)  # e.g., Diabetes, Cardiology
     returnable = models.BooleanField(default=False)
     expiry_date = models.DateField(blank=True, null=True)
+    prescription_required = models.BooleanField(default=False)
 
     # Pricing & Stock
     mrp = models.DecimalField(max_digits=10, decimal_places=2)

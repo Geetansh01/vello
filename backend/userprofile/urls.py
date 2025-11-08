@@ -4,6 +4,7 @@ from .views import (
     DeleteProfileView, ActiveTimeView,
     AddressListCreateView, AddressDetailView
 )
+from .address import PincodeInfoView
 
 urlpatterns = [
     # Profile endpoints
@@ -16,4 +17,6 @@ urlpatterns = [
     # Address endpoints
     path("addresses/", AddressListCreateView.as_view(), name="list-create-address"),
     path("addresses/<int:pk>/", AddressDetailView.as_view(), name="address-detail"),
+    path('address/locality/', PincodeInfoView.as_view(), name='pincode-info'),
+
 ]
