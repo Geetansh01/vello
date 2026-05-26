@@ -40,7 +40,7 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.name)
+            base_slug = slugify(self.name)[:40]
             slug = base_slug
             counter = 1
             # Ensure uniqueness
